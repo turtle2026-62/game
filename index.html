@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>의성 환경 수호대: SDGs 4대 퀘스트 방탈출</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        uiseong: {
+                            green: '#10B981',
+                            blue: '#0EA5E9',
+                            yellow: '#F59E0B',
+                            red: '#EF4444',
+                            dark: '#0F172A',
+                        }
+                    },
+                    fontFamily: {
+                        jua: ['Jua', 'sans-serif'],
+                        noto: ['Noto Sans KR', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #090d16;
+            color: #f8fafc;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .door-glow {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
+        }
+
+        .hit-blink {
+            animation: blinkHit 0.25s infinite alternate;
+        }
+
+        @keyframes blinkHit {
+            from { opacity: 1; filter: drop-shadow(0 0 10px red); }
+            to { opacity: 0.2; filter: drop-shadow(0 0 0px transparent); }
+        }
+
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-8px) scale(1.1); }
+        }
+        .animate-float {
+            animation: floatAnim 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.8); }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden relative">
+
+    <!-- START SCREEN MODAL -->
+    <div id="start-modal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-3xl p-6 md:p-8 text-center border-2 border-emerald-500/50 shadow-2xl space-y-6">
+            <div class="inline-block px-4 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full font-jua text-sm">
+                🌿 의성군 SDGs 서바이벌 방탈출
+            </div>
+            <h1 class="font-jua text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
+                의성 환경 수호대 퀘스트
+            </h1>
+            <p class="text-slate-300 text-xs md:text-sm leading-relaxed">
+                의성의 환경을 위협하는 <b>10마리의 환경 오염 몬스터</b>를 피해<br>
+                <b>방향키</b>로 캐릭터를 이동하여 4개의 방(각 방 4문제씩)을 해제하세요!
+            </p>
+
+            <!-- Character Selection -->
+            <div class="space-y-3">
+                <label class="block text-slate-300 font-jua text-base text-left">1. 대표 캐릭터 선택</label>
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="selectCharacter('garlic', '🧄', '의성 마늘이')" id="char-garlic" class="char-btn bg-emerald-900/40 border-2 border-emerald-500 rounded-2xl p-3 flex flex-col items-center hover:scale-105 transition-all">
+                        <span class="text-4xl mb-1">🧄</span>
+                        <span class="font-jua text-xs text-emerald-300">의성 마늘이</span>
+                    </button>
+                    <button onclick="selectCharacter('apple', '🍎', '옥산 사과')" id="char-apple" class="char-btn bg-slate-800/50 border border-slate-700 rounded-2xl p-3 flex flex-col items-center hover:scale-105 transition-all">
+                        <span class="text-4xl mb-1">🍎</span>
+                        <span class="font-jua text-xs text-slate-300">옥산 사과</span>
+                    </button>
+                    <button onclick="selectCharacter('dino', '🦕', '제오리 공룡')" id="char-dino" class="char-btn bg-slate-800/50 border border-slate-700 rounded-2xl p-3 flex flex-col items-center hover:scale-105 transition-all">
+                        <span class="text-4xl mb-1">🦕</span>
+                        <span class="font-jua text-xs text-slate-300">제오리 공룡</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Name Input -->
+            <div class="space-y-2 text-left">
+                <label for="player-name-input" class="block text-slate-300 font-jua text-base">2. 수호대원 이름 입력</label>
+                <input type="text" id="player-name-input" placeholder="이름을 입력하세요 (예: 의성초 홍길동)" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700 rounded-xl text-white font-noto placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <button onclick="startGame()" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-jua text-lg rounded-2xl transition-all shadow-lg shadow-emerald-900/40 transform active:scale-95">
+                <i class="fa-solid fa-gamepad mr-2"></i>방탈출 수호대 출발하기
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER / STATUS BAR -->
+    <header class="bg-slate-900/90 border-b border-slate-800 p-3 md:p-4 sticky top-0 z-30 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <!-- Player Info & Health -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-2xl shadow-sm" id="header-avatar">
+                    🧄
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-jua text-base md:text-lg text-emerald-400" id="header-name">의성 수호대원</span>
+                        <span class="text-[10px] px-2 py-0.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-md font-mono" id="header-char-name">의성 마늘이</span>
+                    </div>
+                    <div class="flex items-center space-x-1 text-red-500 text-sm" id="hearts-container">
+                        <i class="fa-solid fa-heart"></i>
+                        <i class="fa-solid fa-heart"></i>
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toast / Action Feedback Banner -->
+            <div id="toast-msg" class="hidden sm:block opacity-0 transition-opacity duration-300 text-xs bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-3 py-1.5 rounded-full font-jua">
+                안내 메시지
+            </div>
+
+            <!-- Room Escape Progress & Hint Count -->
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <div class="flex items-center space-x-1 text-xs bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                    <span class="text-slate-400">탈출 방:</span>
+                    <span class="font-bold text-yellow-400 font-mono" id="keys-count">0 / 4</span>
+                </div>
+                <div class="flex items-center space-x-1 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-3 py-1.5 rounded-lg text-xs font-jua">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>남은 힌트:</span>
+                    <span id="hint-count" class="font-mono text-sm font-bold">3</span>개
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- GAME FIELD CONTAINER -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-2 md:p-4 flex flex-col items-center justify-center relative">
+        <!-- Interactive 2D Map Canvas View -->
+        <div id="game-map" class="w-full aspect-[4/3] max-h-[580px] bg-slate-900/90 border-2 border-slate-800 rounded-3xl relative overflow-hidden shadow-2xl">
+            <!-- Background Grid & Uiseong Landmarks -->
+            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px]"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/60 pointer-events-none"></div>
+
+            <!-- Map Title Watermark -->
+            <div class="absolute top-3 left-1/2 -translate-x-1/2 text-slate-700 font-jua text-sm md:text-base pointer-events-none tracking-widest uppercase">
+                <i class="fa-solid fa-compass mr-1"></i> 의성 SDGs 환경 안전구역
+            </div>
+
+            <!-- 4 ESCAPE DOORS (NORTH, EAST, SOUTH, WEST) -->
+            <div id="door-1" class="door-node absolute top-[6%] left-1/2 -translate-x-1/2 flex flex-col items-center cursor-pointer group z-10" onclick="checkDoorProximity(1, true)">
+                <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center text-3xl transition-transform group-hover:scale-110 shadow-lg shadow-amber-900/40" id="door-1-icon">
+                    ⚡
+                </div>
+                <span class="mt-1 text-[11px] font-jua text-amber-300 bg-slate-950/80 px-2 py-0.5 rounded-full border border-amber-500/30">1. 에너지 전환</span>
+                <span class="text-[9px] text-slate-400 font-mono" id="door-1-status">[4문제 잠김 🔒]</span>
+            </div>
+
+            <div id="door-2" class="door-node absolute top-1/2 right-[5%] -translate-y-1/2 flex flex-col items-center cursor-pointer group z-10" onclick="checkDoorProximity(2, true)">
+                <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-3xl transition-transform group-hover:scale-110 shadow-lg shadow-emerald-900/40" id="door-2-icon">
+                    🏙️
+                </div>
+                <span class="mt-1 text-[11px] font-jua text-emerald-300 bg-slate-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">2. 지속가능 도시</span>
+                <span class="text-[9px] text-slate-400 font-mono" id="door-2-status">[4문제 잠김 🔒]</span>
+            </div>
+
+            <div id="door-3" class="door-node absolute bottom-[6%] left-1/2 -translate-x-1/2 flex flex-col items-center cursor-pointer group animate-pulse-glow z-10" onclick="checkDoorProximity(3, true)">
+                <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-cyan-500/20 border-2 border-cyan-400 flex items-center justify-center text-3xl transition-transform group-hover:scale-110 shadow-lg shadow-cyan-900/40" id="door-3-icon">
+                    🔥
+                </div>
+                <span class="mt-1 text-[11px] font-jua text-cyan-300 bg-slate-950/80 px-2 py-0.5 rounded-full border border-cyan-500/30">3. 의성 기후대응⭐</span>
+                <span class="text-[9px] text-slate-400 font-mono" id="door-3-status">[4문제 잠김 🔒]</span>
+            </div>
+
+            <div id="door-4" class="door-node absolute top-1/2 left-[5%] -translate-y-1/2 flex flex-col items-center cursor-pointer group z-10" onclick="checkDoorProximity(4, true)">
+                <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-purple-500/20 border-2 border-purple-400 flex items-center justify-center text-3xl transition-transform group-hover:scale-110 shadow-lg shadow-purple-900/40" id="door-4-icon">
+                    ♻️
+                </div>
+                <span class="mt-1 text-[11px] font-jua text-purple-300 bg-slate-950/80 px-2 py-0.5 rounded-full border border-purple-500/30">4. 생산과 소비</span>
+                <span class="text-[9px] text-slate-400 font-mono" id="door-4-status">[4문제 잠김 🔒]</span>
+            </div>
+
+            <!-- Collectible Field Items -->
+            <div id="item-solar" class="absolute top-[42%] left-[22%] animate-float cursor-pointer text-3xl z-15 transition-transform hover:scale-125" onclick="collectItem('solar')">☀️</div>
+            <div id="item-bike" class="absolute top-[22%] left-[50%] -translate-x-1/2 animate-float cursor-pointer text-3xl z-15 transition-transform hover:scale-125" onclick="collectItem('bike')">🚲</div>
+            <div id="item-hat" class="absolute top-[72%] left-[50%] -translate-x-1/2 animate-float cursor-pointer text-3xl z-15 transition-transform hover:scale-125" onclick="collectItem('hat')">🧢</div>
+            <div id="item-cup" class="absolute top-[42%] right-[22%] animate-float cursor-pointer text-3xl z-15 transition-transform hover:scale-125" onclick="collectItem('cup')">🥤</div>
+            <div id="item-heal" class="absolute top-[58%] left-[50%] -translate-x-1/2 animate-float cursor-pointer text-3xl z-15 transition-transform hover:scale-125" onclick="collectItem('heal')">🧪</div>
+
+            <!-- 10 Moving Environmental Monsters -->
+            <div id="monster-1" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 25%; left: 35%;">👾</div>
+            <div id="monster-2" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 65%; left: 65%;">💨</div>
+            <div id="monster-3" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 40%; left: 70%;">🔥</div>
+            <div id="monster-4" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 30%; left: 55%;">🗑️</div>
+            <div id="monster-5" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 70%; left: 35%;">☣️</div>
+            <div id="monster-6" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 50%; left: 25%;">🦠</div>
+            <div id="monster-7" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 80%; left: 50%;">👾</div>
+            <div id="monster-8" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 20%; left: 75%;">💨</div>
+            <div id="monster-9" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 55%; left: 80%;">🔥</div>
+            <div id="monster-10" class="absolute text-2xl md:text-3xl z-10 pointer-events-none transition-all duration-300 filter drop-shadow-[0_4px_6px_rgba(239,68,68,0.5)]" style="top: 60%; left: 45%;">🗑️</div>
+
+            <!-- Movable Character -->
+            <div id="player-avatar" class="absolute text-4xl md:text-5xl transition-all duration-75 z-20 pointer-events-none filter drop-shadow-[0_8px_8px_rgba(0,0,0,0.8)]" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                🧄
+            </div>
+
+            <!-- Interaction Prompt Overlay -->
+            <div id="interact-prompt" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 bg-yellow-500 text-slate-950 font-jua text-xs md:text-sm px-4 py-1.5 rounded-full shadow-lg border border-yellow-300 animate-bounce pointer-events-none z-30">
+                <i class="fa-solid fa-key mr-1"></i> [SPACE] 또는 터치하여 4문제 자물쇠 풀기!
+            </div>
+        </div>
+
+        <!-- Touch Controls & Inventory Bar -->
+        <div class="w-full mt-3 flex items-center justify-between px-2">
+            <!-- Inventory display with Click to Use -->
+            <div class="flex items-center space-x-2 bg-slate-900/80 px-3 py-2 rounded-2xl border border-slate-800">
+                <span class="text-xs font-jua text-slate-400">인벤토리 터치사용:</span>
+                <div class="flex space-x-1.5 text-2xl" id="inventory-slots">
+                    <button id="btn-solar" onclick="useInventoryItem('solar')" title="태양광 패널 (무료 힌트)" class="opacity-30 transition-all hover:scale-125 disabled:cursor-not-allowed cursor-pointer" disabled>☀️</button>
+                    <button id="btn-bike" onclick="useInventoryItem('bike')" title="사과 자전거 (무료 힌트)" class="opacity-30 transition-all hover:scale-125 disabled:cursor-not-allowed cursor-pointer" disabled>🚲</button>
+                    <button id="btn-hat" onclick="useInventoryItem('hat')" title="쉼터 모자 (무료 힌트)" class="opacity-30 transition-all hover:scale-125 disabled:cursor-not-allowed cursor-pointer" disabled>🧢</button>
+                    <button id="btn-cup" onclick="useInventoryItem('cup')" title="텀블러 (무료 힌트)" class="opacity-30 transition-all hover:scale-125 disabled:cursor-not-allowed cursor-pointer" disabled>🥤</button>
+                    <button id="btn-heal" onclick="useInventoryItem('heal')" title="사과 즙 (체력 +1 회복)" class="opacity-30 transition-all hover:scale-125 disabled:cursor-not-allowed cursor-pointer" disabled>🧪</button>
+                </div>
+            </div>
+
+            <!-- On-screen directional D-Pad -->
+            <div class="grid grid-cols-3 gap-1 w-32 h-24">
+                <div></div>
+                <button onclick="movePlayer(0, -5)" class="bg-slate-800 active:bg-emerald-600 text-white rounded-lg flex items-center justify-center font-bold text-sm shadow"><i class="fa-solid fa-chevron-up"></i></button>
+                <div></div>
+                <button onclick="movePlayer(-5, 0)" class="bg-slate-800 active:bg-emerald-600 text-white rounded-lg flex items-center justify-center font-bold text-sm shadow"><i class="fa-solid fa-chevron-left"></i></button>
+                <button onclick="interactNearestDoor()" class="bg-amber-600 active:bg-amber-500 text-white rounded-lg flex items-center justify-center font-bold text-xs shadow">입장</button>
+                <button onclick="movePlayer(5, 0)" class="bg-slate-800 active:bg-emerald-600 text-white rounded-lg flex items-center justify-center font-bold text-sm shadow"><i class="fa-solid fa-chevron-right"></i></button>
+                <div></div>
+                <button onclick="movePlayer(0, 5)" class="bg-slate-800 active:bg-emerald-600 text-white rounded-lg flex items-center justify-center font-bold text-sm shadow"><i class="fa-solid fa-chevron-down"></i></button>
+                <div></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- QUESTION MODAL (ROOM LOCK QUEST) -->
+    <div id="quest-modal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-40 flex items-center justify-center p-3 md:p-4">
+        <div class="glass-card max-w-2xl w-full rounded-3xl p-5 md:p-7 border-2 border-emerald-500/50 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header with Sequential Progress -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl" id="modal-room-icon">⚡</span>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="font-jua text-xl md:text-2xl text-emerald-400" id="modal-room-title">에너지 전환 문</h2>
+                            <span class="px-2.5 py-0.5 bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 rounded-full text-xs font-mono font-bold" id="quest-progress-badge">문제 1 / 4</span>
+                        </div>
+                        <p class="text-slate-400 text-xs">방 하나당 연속 4개 문제를 모두 맞춰야 탈출 열쇠를 얻습니다!</p>
+                    </div>
+                </div>
+                <button onclick="closeQuestModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Standard Question Form (Rooms 1, 2, 4) -->
+            <div id="standard-question-body" class="space-y-4 my-4">
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+                    <span class="text-xs text-emerald-400 font-mono font-bold block mb-1" id="quest-step-label">QUEST QUESTION #1</span>
+                    <p class="font-jua text-base md:text-lg text-slate-100 leading-snug" id="question-text">
+                        질문이 들어가는 공간입니다.
+                    </p>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label for="answer-input" class="text-xs font-jua text-slate-300">수호대원의 생각 적기 (성의 있는 답변 필수!)</label>
+                        <button onclick="useHint()" class="text-xs text-yellow-400 hover:underline flex items-center font-jua">
+                            <i class="fa-solid fa-lightbulb mr-1"></i> 힌트 보기 (<span id="modal-hint-left">3</span>/3)
+                        </button>
+                    </div>
+                    <textarea id="answer-input" rows="3" placeholder="배운 내용을 바탕으로 정성스럽게 답변을 작성해 주세요. ('몰라', 'ㅇㅇ' 등 불성실한 단답은 통과할 수 없습니다)" class="w-full p-3.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-noto text-sm placeholder-slate-500 focus:outline-none focus:border-emerald-500"></textarea>
+                    <p id="hint-box" class="hidden text-xs bg-yellow-500/10 border border-yellow-500/40 text-yellow-300 p-3 rounded-xl font-noto font-bold"></p>
+                </div>
+            </div>
+
+            <!-- Uiseong Climate Special Question Form (Room 3) -->
+            <div id="uiseong-question-body" class="hidden space-y-4 my-4">
+                <div class="bg-cyan-950/40 p-4 rounded-2xl border border-cyan-500/30 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-cyan-400 font-jua">공개수업 특화 퀘스트</span>
+                        <span class="text-xs px-2 py-0.5 bg-cyan-500/20 text-cyan-300 rounded font-mono">의성 기후 이슈 #<span id="uiseong-q-num">1</span></span>
+                    </div>
+                    <p class="font-jua text-base md:text-lg text-cyan-100" id="uiseong-question-title">
+                        질문이 들어가는 공간입니다.
+                    </p>
+                </div>
+
+                <!-- Dual Answer Fields for Uiseong Special -->
+                <div class="space-y-3">
+                    <div>
+                        <label for="uiseong-cause-input" class="block text-xs font-jua text-emerald-400 mb-1">
+                            ① 원인 줄이기 (예방 및 탄소 감축 대책):
+                        </label>
+                        <input type="text" id="uiseong-cause-input" placeholder="예: 대중교통 이용, 나무 심기, 낭비되는 에너지 줄이기 등" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label for="uiseong-action-input" class="block text-xs font-jua text-cyan-400 mb-1">
+                            ② 피해 대비하기 (적응 및 안전 대비책):
+                        </label>
+                        <input type="text" id="uiseong-action-input" placeholder="예: 무더위 쉼터 이용, 배수구 점검, 저수지 관리, 산불 감시 등" class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button onclick="useHint()" class="text-xs text-yellow-400 hover:underline flex items-center font-jua">
+                        <i class="fa-solid fa-lightbulb mr-1"></i> 의성 기후 힌트 보기 (<span id="modal-hint-left-uiseong">3</span>/3)
+                    </button>
+                </div>
+                <p id="uiseong-hint-box" class="hidden text-xs bg-yellow-500/10 border border-yellow-500/40 text-yellow-300 p-3 rounded-xl font-noto font-bold"></p>
+            </div>
+
+            <!-- Feedback Message -->
+            <div id="quest-feedback" class="hidden p-3 rounded-xl text-xs font-jua text-center"></div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex space-x-3 pt-3">
+                <button onclick="closeQuestModal()" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-jua text-sm rounded-xl transition-all">
+                    잠시 나가기
+                </button>
+                <button onclick="submitAnswer()" class="w-2/3 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-jua text-sm rounded-xl transition-all shadow-lg shadow-emerald-900/40" id="btn-submit-answer">
+                    정답 제출하기 <i class="fa-solid fa-check ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME OVER MODAL -->
+    <div id="gameover-modal" class="hidden fixed inset-0 bg-rose-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-3xl p-6 text-center border-2 border-rose-500 shadow-2xl space-y-5">
+            <div class="text-6xl animate-bounce">💀</div>
+            <div>
+                <h2 class="font-jua text-3xl text-rose-400">환경 몬스터의 습격!</h2>
+                <p class="text-slate-300 text-xs mt-1">생명력이 0이 되어 의성 환경 수호에 실패했습니다.</p>
+            </div>
+            <button onclick="retryLevel()" class="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-jua text-base rounded-xl transition-all shadow-lg">
+                <i class="fa-solid fa-rotate-right mr-2"></i>부활하여 다시 도전하기
+            </button>
+        </div>
+    </div>
+
+    <!-- SUCCESS ESCAPE MODAL (CERTIFICATE) -->
+    <div id="success-modal" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-3xl p-6 md:p-8 text-center border-4 border-yellow-400 shadow-2xl space-y-6 relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-36 h-36 bg-yellow-400/10 rounded-full blur-2xl"></div>
+            
+            <div class="text-5xl animate-bounce">🏆</div>
+            <div>
+                <span class="text-xs px-3 py-1 bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 rounded-full font-jua">미션 완수! 4대 SDG 방탈출 성공</span>
+                <h2 class="font-jua text-3xl text-yellow-400 mt-2">의성 환경 수호대 임명장</h2>
+            </div>
+
+            <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-700 text-left space-y-3">
+                <div class="flex justify-between items-center text-xs text-slate-400 border-b border-slate-800 pb-2">
+                    <span>수호대원: <b class="text-white text-sm" id="cert-name">홍길동</b></span>
+                    <span>캐릭터: <b class="text-emerald-400 font-mono" id="cert-char">🧄 의성 마늘이</b></span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed font-noto">
+                    위 대원은 <b>에너지 전환, 지속가능한 도시, 의성 기후대응, 생산과 소비</b> 4대 핵심 주제의 지식을 완벽히 습득하고 의성의 환경 오염 몬스터들을 격퇴하였으므로 <b>[의성 명예 환경 수호대원]</b>으로 임명합니다.
+                </p>
+            </div>
+
+            <button onclick="restartGame()" class="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-jua text-lg rounded-2xl transition-all shadow-lg shadow-amber-900/40">
+                <i class="fa-solid fa-arrow-rotate-left mr-2"></i>새로운 모험 다시하기
+            </button>
+        </div>
+    </div>
+
+    <!-- Script Section -->
+    <script>
+        // Game State Variables
+        let playerName = "";
+        let selectedCharacter = "garlic";
+        let characterEmoji = "🧄";
+        let characterName = "의성 마늘이";
+        let remainingHints = 3;
+        let currentRoomId = null;
+        let currentQuestionStep = 0; // 0 to 3 (4 questions per room)
+        let health = 3;
+        let isInvincible = false;
+        let monsterInterval = null;
+
+        // Player Initial Position (%)
+        let playerPosX = 50;
+        let playerPosY = 50;
+
+        // Field Item Positions
+        const itemPositions = {
+            solar: { x: 22, y: 42 },
+            bike: { x: 50, y: 22 },
+            hat: { x: 50, y: 72 },
+            cup: { x: 78, y: 42 },
+            heal: { x: 50, y: 58 }
+        };
+
+        // 10 Monsters State
+        const monsters = [
+            { id: 'monster-1', x: 35, y: 25, vx: 0.8, vy: 0.5 },
+            { id: 'monster-2', x: 65, y: 65, vx: -0.7, vy: 0.6 },
+            { id: 'monster-3', x: 70, y: 40, vx: 0.6, vy: -0.8 },
+            { id: 'monster-4', x: 55, y: 30, vx: -0.6, vy: -0.6 },
+            { id: 'monster-5', x: 35, y: 70, vx: 0.7, vy: -0.5 },
+            { id: 'monster-6', x: 25, y: 50, vx: -0.5, vy: 0.7 },
+            { id: 'monster-7', x: 50, y: 80, vx: 0.9, vy: -0.4 },
+            { id: 'monster-8', x: 75, y: 20, vx: -0.8, vy: 0.7 },
+            { id: 'monster-9', x: 80, y: 55, vx: -0.6, vy: -0.7 },
+            { id: 'monster-10', x: 45, y: 60, vx: 0.7, vy: 0.8 }
+        ];
+
+        // Collected Inventory Items
+        const inventory = {
+            solar: false,
+            bike: false,
+            hat: false,
+            cup: false,
+            heal: false
+        };
+
+        // Escaped Doors Track
+        const unlockedDoors = {
+            1: false,
+            2: false,
+            3: false,
+            4: false
+        };
+
+        // 4 Questions Pool for Each Theme (Total 16 Questions)
+        const roomQuestionPool = {
+            1: [
+                { q: "석탄과 석유 대신 태양광, 풍력, 수력처럼 계속 새로 생겨나는 깨끗한 에너지를 무엇이라고 부를까요?", keywords: ["신재생", "재생", "친환경", "청정"], hint: "💡 힌트: 🌿 신OO energy 또는 재OO energy" },
+                { q: "우리가 집에서 전기를 아끼면 화석연료 발생 탄소를 줄일 수 있습니다. 생활 속 전기 절약 방법 한 가지를 적으세요.", keywords: ["플러그", "코드", "스위치", "소등", "끄기", "안쓸때", "대기전력"], hint: "💡 힌트: 사용하지 않는 가전제품의 플러그 뽑기 등" },
+                { q: "화석 연료를 태울 때 발생하는 가스로, 지구온난화의 가장 큰 원인이 되는 기체의 이름은 무엇일까요?", keywords: ["이산화탄소", "탄소", "온실가스"], hint: "💡 힌트: 이산화OO 또는 온실가스" },
+                { q: "에너지 전환이 필요한 이유를 '지구'와 '환경' 단어를 포함해서 한 줄로 적어보세요.", keywords: ["지구", "환경", "온난화", "보호", "지키", "탄소"], hint: "💡 힌트: 지구 온난화를 막고 환경을 보호하기 위해서" }
+            ],
+            2: [
+                { q: "지속가능한 도시를 위해 자동차 대신 이용할 수 있는 친환경 이동 수단을 2가지 적어보세요.", keywords: ["자전거", "버스", "지하철", "도보", "걷기", "전기차"], hint: "💡 힌트: 🚲 자전거, 대중교통 등" },
+                { q: "도시 안에 나무를 많이 심어 만든 '이 공간'은 도심 열섬 현상을 막고 미세먼지를 줄여줍니다. 어디일까요?", keywords: ["숲", "공원", "녹지", "정원"], hint: "💡 힌트: 도시 숲 또는 도시 공원" },
+                { q: "쓰레기를 함부로 버리지 않고 자원으로 다시 쓰는 친환경 도시 순환 방식을 무엇이라고 할까요?", keywords: ["재활용", "재사용", "순환", "리사이클"], hint: "💡 힌트: 분리배출을 통한 재OO" },
+                { q: "모든 시민이 안전하고 깨끗하게 살 수 있는 지속가능한 도시를 위해 내가 실천할 수 있는 일을 적어보세요.", keywords: ["쓰레기", "줍기", "대중교통", "아끼기", "청소", "분리배출"], hint: "💡 힌트: 쓰레기 무단투기 안 하기, 길거리 줍깅 등" }
+            ],
+            3: [
+                { 
+                    q: "☀️ [의성 기후 문제 ① - 폭염] 의성의 여름철 폭염 피해를 극복하기 위해 ①원인 줄이기(탄소 감축)와 ②피해 대비하기(대피 및 적응)를 각각 적으세요.",
+                    hint: "💡 힌트: ①원인: 탄소 감축/대중교통 이용, ②대비: 무더위 쉼터 이용/양산 쓰기/물 자주 마시기"
+                },
+                { 
+                    q: "🌧️ [의성 기후 문제 ② - 집중호우] 의성의 하천 범람과 게릴라성 집중호우에 대응하기 위해 ①원인 줄이기와 ②피해 대비하기를 각각 적으세요.",
+                    hint: "💡 힌트: ①원인: 기후변화 예방/나무 심기, ②대비: 빗물 배수구 청소/대피 장소 확인"
+                },
+                { 
+                    q: "🌾 [의성 기후 문제 ③ - 가뭄] 의성의 옥산 사과 등 농가 피해를 일으키는 가뭄에 대응하기 위해 ①원인 줄이기와 ②피해 대비하기를 각각 적으세요.",
+                    hint: "💡 힌트: ①원인: 생활 속 물 아껴쓰기/탄소 감축, ②대비: 저수지 물 확보/빗물 재활용"
+                },
+                { 
+                    q: "🔥 [의성 기후 문제 ④ - 산불] 의성의 소중한 산림과 건조한 날씨 속 산불을 예방하기 위해 ①원인 줄이기와 ②피해 대비하기를 각각 적으세요.",
+                    hint: "💡 힌트: ①원인: 산에서 불씨/화기 사용 금지, ②대비: 산불 감시원 배치/발생 시 즉시 신고 및 대피"
+                }
+            ],
+            4: [
+                { q: "물건을 살 때 쓰레기를 줄이기 위해 일회용품 대신 가져가야 하는 친환경 준비물 2가지를 적어보세요.", keywords: ["장바구니", "텀블러", "다회용", "용기", "에코백"], hint: "💡 힌트: 🛍️ 장바구니, 🥤 텀블러 등" },
+                { q: "물건을 생산하고 소비할 때 발생하는 탄소 발자국을 줄이는 소비 방식을 무엇이라고 할까요?", keywords: ["착한", "친환경", "지속가능", "윤리", "가치"], hint: "💡 힌트: 친환경 소비 또는 윤리적 소비" },
+                { q: "음식을 남기면 발생하는 음식물 쓰레기 역시 지구를 아프게 합니다. 잔반을 줄이는 좋은 방법은 무엇일까요?", keywords: ["먹을만큼", "알맞게", "남기지", "적당히"], hint: "💡 힌트: 먹을 만큼만 적당히 담아 남기지 않기" },
+                { q: "플라스틱 상표 라벨을 떼고 페트병을 깨끗이 비워 배출하는 행동을 세 글자로 무엇이라고 하나요?", keywords: ["분리수거", "분리배출", "재활용"], hint: "💡 힌트: ♻️ 분리OO" }
+            ]
+        };
+
+        // Character Select Logic
+        function selectCharacter(id, emoji, name) {
+            selectedCharacter = id;
+            characterEmoji = emoji;
+            characterName = name;
+
+            document.querySelectorAll('.char-btn').forEach(btn => {
+                btn.classList.remove('border-emerald-500', 'bg-emerald-900/40');
+                btn.classList.add('border-slate-700', 'bg-slate-800/50');
+            });
+
+            const activeBtn = document.getElementById(`char-${id}`);
+            activeBtn.classList.remove('border-slate-700', 'bg-slate-800/50');
+            activeBtn.classList.add('border-emerald-500', 'bg-emerald-900/40');
+        }
+
+        // Start Game Init
+        function startGame() {
+            const input = document.getElementById('player-name-input');
+            const val = input.value.trim();
+            if (!val) {
+                alert("수호대원 이름을 입력해주세요!");
+                return;
+            }
+            playerName = val;
+
+            // UI Header Updates
+            document.getElementById('header-name').innerText = playerName;
+            document.getElementById('header-char-name').innerText = characterName;
+            document.getElementById('header-avatar').innerText = characterEmoji;
+            document.getElementById('player-avatar').innerText = characterEmoji;
+
+            // Hide Start Modal
+            document.getElementById('start-modal').classList.add('hidden');
+
+            // Keyboard Movement Listener
+            window.addEventListener('keydown', handleKeyPress);
+
+            // Start Monster Movement Loop
+            startMonsterLoop();
+        }
+
+        // Player Keyboard Movement (WASD / Arrow Keys)
+        function handleKeyPress(e) {
+            const step = 4;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                movePlayer(0, -step);
+            } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+                movePlayer(0, step);
+            } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                movePlayer(-step, 0);
+            } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                movePlayer(step, 0);
+            } else if (e.key === ' ') {
+                interactNearestDoor();
+            }
+        }
+
+        function movePlayer(dx, dy) {
+            playerPosX = Math.max(8, Math.min(92, playerPosX + dx));
+            playerPosY = Math.max(12, Math.min(88, playerPosY + dy));
+
+            const avatar = document.getElementById('player-avatar');
+            avatar.style.left = `${playerPosX}%`;
+            avatar.style.top = `${playerPosY}%`;
+
+            checkItemPickup();
+            checkDoorProximity();
+            checkMonsterCollisions();
+        }
+
+        // Automatic Item Collision Pickup Check
+        function checkItemPickup() {
+            Object.keys(itemPositions).forEach(type => {
+                if (!inventory[type]) {
+                    const pos = itemPositions[type];
+                    const dist = Math.hypot(playerPosX - pos.x, playerPosY - pos.y);
+                    if (dist < 6) {
+                        collectItem(type);
+                    }
+                }
+            });
+        }
+
+        // Collect Item Function
+        function collectItem(type) {
+            if (inventory[type]) return;
+            inventory[type] = true;
+
+            const el = document.getElementById(`item-${type}`);
+            if (el) el.classList.add('hidden');
+
+            // Enable Inventory Button
+            const btn = document.getElementById(`btn-${type}`);
+            if (btn) {
+                btn.classList.remove('opacity-30');
+                btn.removeAttribute('disabled');
+                btn.classList.add('animate-bounce');
+                setTimeout(() => btn.classList.remove('animate-bounce'), 1000);
+            }
+
+            if (type === 'heal') {
+                showTemporaryFeedback("🧪 사과 즙 획득! 하단 아이템 칸을 눌러 체력을 회복하세요.");
+            } else {
+                showTemporaryFeedback("✨ 아이템 획득! 하단 아이템 칸을 눌러 힌트를 획득하세요.");
+            }
+        }
+
+        // Use Inventory Item
+        function useInventoryItem(type) {
+            if (!inventory[type]) return;
+
+            if (type === 'heal') {
+                if (health < 3) {
+                    health++;
+                    updateHeartsUI();
+                    inventory[type] = false;
+                    disableInventoryButton('heal');
+                    showTemporaryFeedback("🧪 사과 즙 사용! 체력이 +1 회복되었습니다.");
+                } else {
+                    alert("이미 체력이 가득 차 있습니다!");
+                }
+            } else {
+                const isModalOpen = !document.getElementById('quest-modal').classList.contains('hidden');
+                if (!isModalOpen) {
+                    alert("이 아이템은 문에 접근해 퀘스트 문제를 풀 때 터치하여 무료 힌트를 얻는 아이템입니다!");
+                    return;
+                }
+
+                inventory[type] = false;
+                disableInventoryButton(type);
+
+                const qObj = roomQuestionPool[currentRoomId][currentQuestionStep];
+                if (currentRoomId === 3) {
+                    const hintBox = document.getElementById('uiseong-hint-box');
+                    hintBox.innerText = `🎁 [아이템 찬스!] ${qObj.hint}`;
+                    hintBox.classList.remove('hidden');
+                } else {
+                    const hintBox = document.getElementById('hint-box');
+                    hintBox.innerText = `🎁 [아이템 찬스!] ${qObj.hint}`;
+                    hintBox.classList.remove('hidden');
+                }
+                showTemporaryFeedback("✨ 아이템을 사용하여 무료 힌트를 획득했습니다!");
+            }
+        }
+
+        function disableInventoryButton(type) {
+            const btn = document.getElementById(`btn-${type}`);
+            if (btn) {
+                btn.classList.add('opacity-30');
+                btn.setAttribute('disabled', 'true');
+            }
+        }
+
+        // Monsters Movement Loop (10 Monsters)
+        function startMonsterLoop() {
+            if (monsterInterval) clearInterval(monsterInterval);
+
+            monsterInterval = setInterval(() => {
+                monsters.forEach(m => {
+                    m.x += m.vx;
+                    m.y += m.vy;
+
+                    // Bounce off map edges
+                    if (m.x <= 15 || m.x >= 85) m.vx *= -1;
+                    if (m.y <= 18 || m.y >= 82) m.vy *= -1;
+
+                    const el = document.getElementById(m.id);
+                    if (el) {
+                        el.style.left = `${m.x}%`;
+                        el.style.top = `${m.y}%`;
+                    }
+                });
+
+                checkMonsterCollisions();
+            }, 100);
+        }
+
+        // Monster Collision Detection & Damage System
+        function checkMonsterCollisions() {
+            if (isInvincible) return;
+
+            monsters.forEach(m => {
+                const dist = Math.hypot(playerPosX - m.x, playerPosY - m.y);
+                if (dist < 5.5) {
+                    takeDamage();
+                }
+            });
+        }
+
+        function takeDamage() {
+            health--;
+            updateHeartsUI();
+
+            const avatar = document.getElementById('player-avatar');
+            avatar.classList.add('hit-blink');
+            isInvincible = true;
+
+            showTemporaryFeedback("⚠️ 몬스터와 충돌하여 생명력이 깎였습니다!");
+
+            if (health <= 0) {
+                triggerGameOver();
+            } else {
+                setTimeout(() => {
+                    avatar.classList.remove('hit-blink');
+                    isInvincible = false;
+                }, 1500);
+            }
+        }
+
+        function updateHeartsUI() {
+            const container = document.getElementById('hearts-container');
+            let html = "";
+            for (let i = 0; i < 3; i++) {
+                if (i < health) {
+                    html += '<i class="fa-solid fa-heart"></i>';
+                } else {
+                    html += '<i class="fa-regular fa-heart opacity-30"></i>';
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        function triggerGameOver() {
+            clearInterval(monsterInterval);
+            document.getElementById('gameover-modal').classList.remove('hidden');
+        }
+
+        function retryLevel() {
+            document.getElementById('gameover-modal').classList.add('hidden');
+            
+            // Reset Health & Position
+            health = 3;
+            updateHeartsUI();
+            
+            playerPosX = 50;
+            playerPosY = 50;
+            const avatar = document.getElementById('player-avatar');
+            avatar.style.left = `${playerPosX}%`;
+            avatar.style.top = `${playerPosY}%`;
+
+            // Reset Monster Positions
+            monsters.forEach((m, idx) => {
+                m.x = 20 + (idx * 7) % 60;
+                m.y = 20 + (idx * 9) % 60;
+            });
+
+            isInvincible = true;
+            avatar.classList.add('hit-blink');
+            setTimeout(() => {
+                avatar.classList.remove('hit-blink');
+                isInvincible = false;
+            }, 2000);
+
+            startMonsterLoop();
+        }
+
+        // Door Proximity Detection
+        function checkDoorProximity(forceRoomId = null, directClick = false) {
+            const doors = [
+                { id: 1, x: 50, y: 12 },
+                { id: 2, x: 90, y: 50 },
+                { id: 3, x: 50, y: 88 },
+                { id: 4, x: 10, y: 50 }
+            ];
+
+            if (directClick && forceRoomId) {
+                openQuestModal(forceRoomId);
+                return;
+            }
+
+            let nearDoor = null;
+            doors.forEach(d => {
+                const dist = Math.hypot(playerPosX - d.x, playerPosY - d.y);
+                if (dist < 15) {
+                    nearDoor = d.id;
+                }
+            });
+
+            const prompt = document.getElementById('interact-prompt');
+            if (nearDoor && !unlockedDoors[nearDoor]) {
+                prompt.classList.remove('hidden');
+            } else {
+                prompt.classList.add('hidden');
+            }
+        }
+
+        function interactNearestDoor() {
+            const doors = [
+                { id: 1, x: 50, y: 12 },
+                { id: 2, x: 90, y: 50 },
+                { id: 3, x: 50, y: 88 },
+                { id: 4, x: 10, y: 50 }
+            ];
+
+            doors.forEach(d => {
+                const dist = Math.hypot(playerPosX - d.x, playerPosY - d.y);
+                if (dist < 15) {
+                    openQuestModal(d.id);
+                }
+            });
+        }
+
+        // Open Quest Modal (Start Sequential 4 Questions)
+        function openQuestModal(roomId) {
+            if (unlockedDoors[roomId]) {
+                alert("이미 4개 문제를 모두 풀고 자물쇠를 해제한 방입니다!");
+                return;
+            }
+
+            // Invincible while solving questions
+            isInvincible = true;
+
+            currentRoomId = roomId;
+            currentQuestionStep = 0; // Reset to 1st question
+
+            const modal = document.getElementById('quest-modal');
+            modal.classList.remove('hidden');
+
+            renderCurrentQuestionStep();
+        }
+
+        // Render Current Question Step (1 to 4)
+        function renderCurrentQuestionStep() {
+            const stdBody = document.getElementById('standard-question-body');
+            const uiseongBody = document.getElementById('uiseong-question-body');
+            const feedback = document.getElementById('quest-feedback');
+
+            feedback.classList.add('hidden');
+            document.getElementById('answer-input').value = "";
+            document.getElementById('uiseong-cause-input').value = "";
+            document.getElementById('uiseong-action-input').value = "";
+            document.getElementById('hint-box').classList.add('hidden');
+            document.getElementById('uiseong-hint-box').classList.add('hidden');
+
+            document.getElementById('modal-hint-left').innerText = remainingHints;
+            document.getElementById('modal-hint-left-uiseong').innerText = remainingHints;
+            document.getElementById('quest-progress-badge').innerText = `문제 ${currentQuestionStep + 1} / 4`;
+
+            const qObj = roomQuestionPool[currentRoomId][currentQuestionStep];
+
+            if (currentRoomId === 3) {
+                // Room 3: Uiseong Special
+                stdBody.classList.add('hidden');
+                uiseongBody.classList.remove('hidden');
+                document.getElementById('modal-room-icon').innerText = '🔥';
+                document.getElementById('modal-room-title').innerText = '3. 의성 기후대응 (공개수업)';
+                document.getElementById('uiseong-q-num').innerText = currentQuestionStep + 1;
+                document.getElementById('uiseong-question-title').innerText = qObj.q;
+            } else {
+                // Rooms 1, 2, 4
+                stdBody.classList.remove('hidden');
+                uiseongBody.classList.add('hidden');
+
+                const roomMeta = {
+                    1: { icon: '⚡', title: '1. 에너지 전환 문' },
+                    2: { icon: '🏙️', title: '2. 지속가능한 도시 문' },
+                    4: { icon: '♻️', title: '4. 생산과 소비 문' }
+                };
+
+                document.getElementById('modal-room-icon').innerText = roomMeta[currentRoomId].icon;
+                document.getElementById('modal-room-title').innerText = roomMeta[currentRoomId].title;
+                document.getElementById('quest-step-label').innerText = `QUEST QUESTION #${currentQuestionStep + 1}`;
+                document.getElementById('question-text').innerText = qObj.q;
+            }
+        }
+
+        function closeQuestModal() {
+            document.getElementById('quest-modal').classList.add('hidden');
+            isInvincible = false;
+        }
+
+        function useHint() {
+            if (remainingHints <= 0) {
+                alert("힌트 3회를 모두 사용하셨습니다! 필드의 아이템을 사용하여 힌트를 얻어보세요.");
+                return;
+            }
+
+            remainingHints--;
+            document.getElementById('hint-count').innerText = remainingHints;
+            document.getElementById('modal-hint-left').innerText = remainingHints;
+            document.getElementById('modal-hint-left-uiseong').innerText = remainingHints;
+
+            const qObj = roomQuestionPool[currentRoomId][currentQuestionStep];
+
+            if (currentRoomId === 3) {
+                const hintBox = document.getElementById('uiseong-hint-box');
+                hintBox.innerText = qObj.hint;
+                hintBox.classList.remove('hidden');
+            } else {
+                const hintBox = document.getElementById('hint-box');
+                hintBox.innerText = qObj.hint;
+                hintBox.classList.remove('hidden');
+            }
+        }
+
+        function submitAnswer() {
+            const feedback = document.getElementById('quest-feedback');
+            feedback.classList.remove('hidden', 'bg-red-500/20', 'text-red-300', 'bg-emerald-500/20', 'text-emerald-300', 'border-red-500/30', 'border-emerald-500/30');
+
+            if (currentRoomId === 3) {
+                const cause = document.getElementById('uiseong-cause-input').value.trim();
+                const action = document.getElementById('uiseong-action-input').value.trim();
+
+                if (cause.length < 3 || action.length < 3) {
+                    feedback.classList.add('bg-red-500/20', 'text-red-300', 'border', 'border-red-500/30');
+                    feedback.innerText = "❌ 성의 없는 답변입니다! ① 원인 줄이기와 ② 피해 대비하기를 각각 3글자 이상 정성스럽게 적어주세요.";
+                    return;
+                }
+
+                const invalidPatterns = ["몰라", "모름", "ㅇㅇ", "ㄴㄴ", "ㅋㅋㅋ", "ㅎㅎ", "없음", "글쎄"];
+                if (invalidPatterns.some(p => cause.includes(p) || action.includes(p))) {
+                    feedback.classList.add('bg-red-500/20', 'text-red-300', 'border', 'border-red-500/30');
+                    feedback.innerText = "⚠️ '몰라', 'ㅇㅇ' 등의 단답형이나 불성실한 표현으로는 자물쇠를 풀 수 없습니다!";
+                    return;
+                }
+
+                advanceToNextQuestion();
+            } else {
+                const ans = document.getElementById('answer-input').value.trim();
+
+                if (ans.length < 3) {
+                    feedback.classList.add('bg-red-500/20', 'text-red-300', 'border', 'border-red-500/30');
+                    feedback.innerText = "❌ 성의 있는 답변을 3글자 이상 정성스럽게 입력해 주세요!";
+                    return;
+                }
+
+                const invalidPatterns = ["몰라", "모름", "ㅇㅇ", "ㄴㄴ", "ㅋㅋㅋ", "ㅎㅎ", "없음"];
+                if (invalidPatterns.some(p => ans.includes(p))) {
+                    feedback.classList.add('bg-red-500/20', 'text-red-300', 'border', 'border-red-500/30');
+                    feedback.innerText = "⚠️ 장난스러운 답변이나 단답으로는 문이 열리지 않습니다!";
+                    return;
+                }
+
+                const qObj = roomQuestionPool[currentRoomId][currentQuestionStep];
+                const isCorrect = qObj.keywords.some(kw => ans.includes(kw));
+
+                if (!isCorrect && ans.length < 10) {
+                    feedback.classList.add('bg-red-500/20', 'text-red-300', 'border', 'border-red-500/30');
+                    feedback.innerText = "🤔 생각한 핵심 키워드가 포함되어 있지 않거나 설명이 조금 부족합니다. 힌트를 활용해 보세요!";
+                    return;
+                }
+
+                advanceToNextQuestion();
+            }
+        }
+
+        function advanceToNextQuestion() {
+            currentQuestionStep++;
+            if (currentQuestionStep < 4) {
+                showTemporaryFeedback(`👏 정답입니다! 다음 문제(${currentQuestionStep + 1}/4)로 이동합니다.`);
+                renderCurrentQuestionStep();
+            } else {
+                unlockCurrentRoom();
+            }
+        }
+
+        function unlockCurrentRoom() {
+            unlockedDoors[currentRoomId] = true;
+            closeQuestModal();
+
+            const icon = document.getElementById(`door-${currentRoomId}-icon`);
+            const status = document.getElementById(`door-${currentRoomId}-status`);
+
+            icon.innerHTML = '<i class="fa-solid fa-key text-yellow-400 animate-bounce"></i>';
+            status.innerText = "[해제 완료 ✨]";
+            status.className = "text-[9px] text-emerald-400 font-mono font-bold";
+
+            const count = Object.values(unlockedDoors).filter(Boolean).length;
+            document.getElementById('keys-count').innerText = `${count} / 4`;
+
+            showTemporaryFeedback(`🎉 ${currentRoomId}번 문 자물쇠 해제 성공! (${count}/4 완료)`);
+
+            if (count === 4) {
+                setTimeout(() => {
+                    triggerFinalVictory();
+                }, 1000);
+            }
+        }
+
+        function triggerFinalVictory() {
+            clearInterval(monsterInterval);
+            document.getElementById('cert-name').innerText = playerName;
+            document.getElementById('cert-char').innerText = `${characterEmoji} ${characterName}`;
+            document.getElementById('success-modal').classList.remove('hidden');
+
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function showTemporaryFeedback(msg) {
+            const toast = document.getElementById('toast-msg');
+            toast.innerText = msg;
+            toast.classList.remove('hidden', 'opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        function restartGame() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
